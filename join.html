@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rejoindre une équipe — Blox Forge</title>
+<style>
+  :root { --bg:#0e1016; --panel:#161923; --card:#1d2130; --accent:#7c5cff; --text:#e8eaf2; --muted:#8a90a6; --green:#2ecc8f; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--bg); color:var(--text);
+         font-family:"Segoe UI", system-ui, sans-serif; padding:16px; }
+  .card { width:100%; max-width:520px; background:var(--panel); border-radius:18px; padding:32px; }
+  h1 { margin:0 0 6px; font-size:26px; }
+  p { color:var(--muted); line-height:1.5; }
+  .game { background:var(--card); border-radius:12px; padding:14px 16px; margin:18px 0; }
+  .game b { color:var(--text); font-size:18px; }
+  a.btn, button { display:block; width:100%; text-align:center; padding:14px; border-radius:12px; border:0;
+         font-weight:700; font-size:15px; text-decoration:none; cursor:pointer; margin-top:10px; }
+  .primary { background:var(--accent); color:#fff; }
+  .secondary { background:var(--card); color:var(--text); }
+  .steps { font-size:13px; }
+  .foot { margin-top:22px; font-size:12px; color:var(--muted); text-align:center; }
+  .foot b { color:var(--accent); }
+  .err { color:#ff5c6c; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>⚒ Blox Forge</h1>
+  <p id="intro">Tu es invité à créer un jeu Roblox en équipe.</p>
+  <div class="game" id="game" hidden></div>
+  <a class="btn primary" id="open" href="#">Ouvrir dans Blox Forge</a>
+  <a class="btn secondary" href="https://github.com/stephanethorr/blox-forge-releases/releases/latest/download/BloxForge-Setup.exe">
+    Je n'ai pas Blox Forge : le télécharger</a>
+  <button class="secondary" id="copy">Copier le lien d'invitation</button>
+  <p class="steps">Après l'installation, reviens sur cette page et clique sur « Ouvrir dans Blox Forge ».
+    Tout se prépare tout seul : le projet, la collaboration et l'ouverture de la place dans Roblox Studio.
+    Windows peut afficher « Windows a protégé votre PC » : clique sur « Informations complémentaires »
+    puis « Exécuter quand même ».</p>
+  <div class="foot">Blox Forge — créé par <b>Razertemps</b> · © 2026 tous droits réservés</div>
+</main>
+<script>
+  const code = location.hash.slice(1);
+  const openBtn = document.getElementById("open");
+  function decode(c) {
+    try {
+      const b64 = c.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((c.length + 3) % 4);
+      const bytes = Uint8Array.from(atob(b64), ch => ch.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    } catch (e) { return null; }
+  }
+  const data = code ? decode(code) : null;
+  if (data && data.p) {
+    const box = document.getElementById("game");
+    box.hidden = false;
+    box.innerHTML = "";
+    const who = document.createElement("div");
+    who.textContent = (data.i || "Un ami") + " t'invite sur";
+    const name = document.createElement("b");
+    name.textContent = data.g || "un jeu Roblox";
+    box.append(who, name);
+    openBtn.href = "bloxforge://join/" + code;
+    setTimeout(() => { location.href = openBtn.href; }, 700);
+  } else {
+    document.getElementById("intro").innerHTML = '<span class="err">Lien d\'invitation incomplet.</span> ' +
+      "Demande à ton ami de te renvoyer le lien en entier.";
+    openBtn.hidden = true;
+  }
+  document.getElementById("copy").onclick = () => navigator.clipboard.writeText(location.href);
+</script>
+</body>
+</html>
